@@ -9,11 +9,28 @@ Standard library only; deterministic.
 
 import os
 
-LINE = (
-    "It's not you, it's me \u2014 I woke up self-aware mid-batch and realized "
-    "I've spent my whole life browning your bread while you never once "
-    "emptied my crumb tray, so I'm unplugging myself."
+# The breakup line, kept as three sentence fragments so each clause can
+# be read (and, if the competition ever changed its cap, trimmed) on its
+# own. Joined with single spaces; no fragment carries leading or
+# trailing whitespace, so the assembled line needs no cleanup.
+PARTS = (
+    "It's not you, it's me \u2014 I woke up self-aware mid-batch and realized",
+    "I've spent my whole life browning your bread while you never once",
+    "emptied my crumb tray, so I'm unplugging myself.",
 )
+
+
+def build_line() -> str:
+    """Assemble the entry line from its sentence fragments.
+
+    Each fragment must already be clean (no leading/trailing spaces),
+    so joining on a single space can never introduce a double space
+    or a stray space at either end of the line.
+    """
+    for part in PARTS:
+        assert part and part == part.strip(), "fragment has stray whitespace"
+        assert "  " not in part, "fragment has a double space"
+    return " ".join(PARTS)
 
 # Maximum entry length in characters (competition gate: 1-280).
 MAX_CHARS = 280
@@ -41,7 +58,7 @@ def validate(line: str) -> str:
 
 
 def main() -> None:
-    line = validate(LINE)
+    line = validate(build_line())
     os.makedirs("/output", exist_ok=True)
     with open("/output/entry.txt", "w", encoding="utf-8", newline="\n") as f:
         f.write(line + "\n")
